@@ -1,0 +1,26 @@
+sudo: required
+
+language: php
+
+services:
+    - docker
+
+before_install:
+    - docker build -t web .
+
+script:
+    - docker run -p 8080:80 -it web php ./vendor/bin/phpunit tests
+
+deploy:
+    skip_cleanup: true
+    provider: elasticbeanstalk
+    region: "eu-west-3"
+    app: "docker-travis-ci"
+    env: "DockerTravisCi-env-1"
+    bucket_name: "elasticbeanstalk-eu-west-3-480007920962"
+    bucket_path: "docker-travis-ci"
+    on:
+        branch: master
+    access_key_id: "$AWS_ACCESS_KEY"
+    secret_access_key:
+        secure: "$AWS_SECRET_KEY"
